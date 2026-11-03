@@ -2,100 +2,72 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tạo mã QR</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#e8eef2;
-  --panel:#fff;
-  --ink:#14232b;
-  --muted:#5b6b75;
-  --line:#c8d3da;
-  --field:#f6f9fb;
-  --accent:#0e6b66;
-  --danger:#b3261e;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  padding:20px 16px 40px;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  line-height:1.5;
-}
-.app{max-width:520px;margin:0 auto}
-h1{font-size:26px;font-weight:700;margin:4px 0 16px;letter-spacing:-.3px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;background:#d5dee4;border-radius:12px;padding:4px;margin-bottom:16px}
-.tab{
-  border:0;background:transparent;color:var(--muted);
-  font:inherit;font-weight:600;font-size:15px;
-  padding:11px 8px;border-radius:9px;cursor:pointer;
-}
-.tab[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(20,35,43,.18)}
-.panel{background:var(--panel);border-radius:16px;padding:18px;margin-bottom:16px}
-label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
-textarea,input[type="url"],select{
-  width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--field);
-  border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;
-}
-textarea{min-height:110px;resize:vertical}
+:root{--bg:#e8eef2;--panel:#fff;--ink:#14232b;--muted:#5b6b75;--line:#c8d3da;--field:#f6f9fb;--accent:#0e6b66;--danger:#b3261e;--soft:#dde6eb}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100dvh;padding:max(16px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:440px;margin:0 auto;display:grid;gap:12px}
+.card{background:var(--panel);border-radius:16px;padding:14px;display:grid;gap:12px}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+textarea,input[type=url],select{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:84px;resize:vertical}
+input[type=color]{width:100%;height:42px;padding:3px;background:var(--field);border:1.5px solid var(--line);border-radius:10px}
 [hidden]{display:none!important}
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.full{grid-column:1/-1}
-input[type="color"]{
-  width:100%;height:44px;padding:3px;cursor:pointer;
-  background:var(--field);border:1.5px solid var(--line);border-radius:10px;
-}
-.btn{
-  border:0;font:inherit;font-weight:600;font-size:16px;
-  padding:13px 18px;border-radius:12px;cursor:pointer;width:100%;
-}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--soft);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:14px;padding:8px 4px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(20,35,43,.18)}
+.stage{display:grid;place-items:center;aspect-ratio:1;background:var(--field);border:1.5px dashed var(--line);border-radius:14px;color:var(--muted);font-size:14px;overflow:hidden}
+canvas{width:100%;height:100%;object-fit:contain;display:block}
+.error{margin:0;min-height:0;color:var(--danger);font-size:14px;text-align:center}
+.error:empty{display:none}
+.btn{border:0;font:inherit;font-weight:600;font-size:15px;padding:12px 8px;border-radius:12px;cursor:pointer;background:var(--soft);color:var(--ink)}
 .btn.primary{background:var(--accent);color:#fff}
-.btn.ghost{background:#e3ebef;color:var(--ink)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn:active:not(:disabled){transform:translateY(1px)}
-:is(.tab,.btn,input,select,textarea):focus-visible{outline:3px solid #6bb7b1;outline-offset:2px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.logo-info{display:flex;align-items:center;gap:10px;margin-top:10px}
-.logo-info img{width:44px;height:44px;flex:none;object-fit:contain;background:var(--field);border:1.5px solid var(--line);border-radius:8px}
-.logo-info input{flex:1;accent-color:var(--accent)}
-.logo-info span{min-width:40px;text-align:right;font-size:13px;color:var(--muted)}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.result{text-align:center}
-.stage{
-  display:flex;align-items:center;justify-content:center;min-height:260px;padding:14px;
-  background:var(--field);border:1.5px dashed var(--line);border-radius:14px;color:var(--muted);font-size:14px;
-}
-.stage canvas{max-width:100%;height:auto;display:block;border-radius:6px}
-.error{min-height:20px;margin:10px 0 0;color:var(--danger);font-weight:500;font-size:14px}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.actions{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px}
+details summary{font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";color:var(--muted)}
+details[open] summary::after{content:"–"}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.full{grid-column:1/-1}
+.logo-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.logo-tools{display:grid;gap:10px;margin-top:10px}
+.logo-size{display:flex;align-items:center;gap:10px}
+.logo-size img{width:40px;height:40px;object-fit:contain;background:var(--field);border:1.5px solid var(--line);border-radius:8px}
+.logo-size input{flex:1;min-width:0;accent-color:var(--accent)}
+.logo-size span{min-width:36px;text-align:right;font-size:13px;color:var(--muted)}
+:is(button,input,select,textarea,summary):focus-visible{outline:3px solid #6bb7b1;outline-offset:2px}
 </style>
 </head>
 <body>
-<main class="app">
-  <h1>Tạo mã QR</h1>
-
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" id="tab-text" aria-selected="true">Văn bản</button>
-    <button class="tab" role="tab" id="tab-web" aria-selected="false">Website</button>
-  </div>
-
-  <section class="panel">
-    <div id="view-text">
-      <label for="input-text">Nội dung</label>
-      <textarea id="input-text" placeholder="Nhập hoặc dán văn bản"></textarea>
+<main>
+  <section class="card">
+    <div class="seg" id="seg-mode">
+      <button type="button" data-v="text" aria-pressed="true">Văn bản</button>
+      <button type="button" data-v="web" aria-pressed="false">Website</button>
     </div>
-    <div id="view-web" hidden>
-      <label for="input-web">Địa chỉ website</label>
-      <input type="url" id="input-web" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="vi-du.com">
-    </div>
+    <textarea id="in-text" placeholder="Nhập hoặc dán văn bản" aria-label="Nội dung"></textarea>
+    <input type="url" id="in-web" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="vi-du.com" aria-label="Địa chỉ website" hidden>
+  </section>
 
+  <section class="card">
+    <div class="stage"><span id="empty">QR hiện ở đây</span><canvas id="canvas" hidden></canvas></div>
+    <p class="error" id="error" role="alert"></p>
+    <div class="actions">
+      <button class="btn primary" id="btn-png" type="button" disabled>Tải PNG</button>
+      <button class="btn" id="btn-svg" type="button" disabled>SVG</button>
+      <button class="btn" id="btn-copy" type="button" disabled>Sao chép</button>
+    </div>
+  </section>
+
+  <details class="card">
+    <summary>Tuỳ chọn</summary>
     <div class="opts">
-      <div>
-        <label for="opt-size">Kích thước</label>
+      <div><label for="opt-size">Kích thước</label>
         <select id="opt-size">
           <option value="256">256 px</option>
           <option value="512" selected>512 px</option>
@@ -103,107 +75,70 @@ input[type="color"]{
           <option value="2048">2048 px</option>
         </select>
       </div>
-      <div>
-        <label for="opt-ecc">Chịu lỗi</label>
-        <select id="opt-ecc">
-          <option value="L">Thấp</option>
-          <option value="M" selected>Vừa</option>
-          <option value="Q">Khá</option>
-          <option value="H">Cao</option>
-        </select>
-      </div>
-      <div>
-        <label for="opt-fg">Màu mã</label>
-        <input type="color" id="opt-fg" value="#14232b">
-      </div>
-      <div>
-        <label for="opt-bg">Màu nền</label>
-        <input type="color" id="opt-bg" value="#ffffff">
-      </div>
+      <div><label for="opt-fg">Màu mã</label><input type="color" id="opt-fg" value="#14232b"></div>
+      <div><label for="opt-bg">Màu nền</label><input type="color" id="opt-bg" value="#ffffff"></div>
       <div class="full">
-        <label for="logo-file">Ảnh giữa</label>
-        <input type="file" id="logo-file" class="sr-only" accept="image/*">
-        <div class="row">
-          <button class="btn ghost" id="btn-logo" type="button">Chọn ảnh</button>
-          <button class="btn ghost" id="btn-logo-clear" type="button" disabled>Xoá ảnh</button>
+        <label>Ảnh giữa</label>
+        <input type="file" id="logo-file" accept="image/*" hidden>
+        <div class="logo-row">
+          <button class="btn" id="btn-logo" type="button">Chọn ảnh</button>
+          <button class="btn" id="btn-logo-clear" type="button" disabled>Xoá ảnh</button>
         </div>
-        <div class="logo-info" id="logo-info" hidden>
-          <img id="logo-thumb" alt="">
-          <input type="range" id="logo-size" min="10" max="25" value="16" aria-label="Kích thước ảnh giữa">
-          <span id="logo-pct">16%</span>
+        <div class="logo-tools" id="logo-tools" hidden>
+          <div class="logo-size">
+            <img id="logo-thumb" alt="">
+            <input type="range" id="logo-size" min="10" max="25" value="16" aria-label="Kích thước ảnh giữa">
+            <span id="logo-pct">16%</span>
+          </div>
+          <div class="seg" id="seg-shape">
+            <button type="button" data-v="square" aria-pressed="false">Vuông</button>
+            <button type="button" data-v="rounded" aria-pressed="true">Bo góc</button>
+            <button type="button" data-v="circle" aria-pressed="false">Tròn</button>
+          </div>
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="panel result">
-    <div class="stage" id="stage">
-      <span id="empty">QR hiện ở đây</span>
-      <canvas id="canvas" hidden></canvas>
-    </div>
-    <p class="error" id="error" role="alert"></p>
-    <div class="actions">
-      <button class="btn primary" id="btn-png" type="button" disabled>Tải PNG</button>
-      <button class="btn ghost" id="btn-svg" type="button" disabled>Tải SVG</button>
-    </div>
-  </section>
+  </details>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
-  const el = {
-    tabText: $('tab-text'), tabWeb: $('tab-web'),
-    viewText: $('view-text'), viewWeb: $('view-web'),
-    inputText: $('input-text'), inputWeb: $('input-web'),
-    size: $('opt-size'), ecc: $('opt-ecc'), fg: $('opt-fg'), bg: $('opt-bg'),
-    logoFile: $('logo-file'), btnLogo: $('btn-logo'), btnLogoClear: $('btn-logo-clear'),
-    logoInfo: $('logo-info'), logoThumb: $('logo-thumb'), logoSize: $('logo-size'), logoPct: $('logo-pct'),
-    canvas: $('canvas'), empty: $('empty'), error: $('error'),
-    btnPng: $('btn-png'), btnSvg: $('btn-svg')
-  };
-
+  const canvas = $('canvas');
+  const ctx = canvas.getContext('2d');
+  const buttons = [$('btn-png'), $('btn-svg'), $('btn-copy')];
   const MARGIN = 4;
-  const LOGO_MIN_VERSION = 6;
-  const MSG = {
-    badUrl: 'Địa chỉ website chưa hợp lệ.',
-    tooLong: 'Nội dung quá dài.',
-    notImage: 'File này không phải ảnh.',
-    readFail: 'Không đọc được ảnh.',
-    noLib: 'Không tải được thư viện QR. Kiểm tra mạng rồi mở lại.'
-  };
+  const state = { mode: 'text', shape: 'rounded', logo: null, qr: null };
+  let timer = 0;
+  let copyTimer = 0;
 
-  let mode = 'text';
-  let current = null;
-  let logo = null;
-  let savedEcc = null;
+  const showError = text => { $('error').textContent = text || ''; };
 
   if (!window.qrcode) {
-    el.error.textContent = MSG.noLib;
+    showError('Không tải được thư viện QR. Kiểm tra mạng rồi mở lại.');
     return;
   }
   qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
 
-  const normalizeUrl = raw => {
-    let value = raw.trim();
+  const readContent = () => {
+    if (state.mode === 'text') return { value: $('in-text').value };
+    let value = $('in-web').value.trim();
     if (!value) return { value: '' };
     if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) value = 'https://' + value;
     try {
       const { hostname, href } = new URL(value);
-      if (hostname !== 'localhost' && !hostname.includes('.')) return { value: '', error: MSG.badUrl };
+      if (hostname !== 'localhost' && !hostname.includes('.')) throw 0;
       return { value: href };
     } catch {
-      return { value: '', error: MSG.badUrl };
+      return { value: '', error: 'Địa chỉ website chưa hợp lệ.' };
     }
   };
 
-  const getContent = () =>
-    mode === 'text' ? { value: el.inputText.value } : normalizeUrl(el.inputWeb.value);
-
-  const buildQr = (text, ecc) => {
-    const first = logo ? LOGO_MIN_VERSION : 0;
-    const last = logo ? 40 : 0;
+  const buildQr = text => {
+    const ecc = state.logo ? 'H' : 'M';
+    const first = state.logo ? 6 : 0;
+    const last = state.logo ? 40 : 0;
     let failure;
     for (let version = first; version <= last; version++) {
       try {
@@ -218,181 +153,213 @@ input[type="color"]{
     throw failure;
   };
 
-  const fit = (img, box) => {
-    const scale = Math.min(box / img.naturalWidth, box / img.naturalHeight);
-    return { w: img.naturalWidth * scale, h: img.naturalHeight * scale };
-  };
+  const radius = box => state.shape === 'circle' ? box / 2 : state.shape === 'rounded' ? box * 0.22 : 0;
 
-  const logoRect = count => {
-    let side = Math.max(5, Math.round(count * el.logoSize.value / 100));
+  const logoGeo = count => {
+    let side = Math.max(5, Math.round(count * $('logo-size').value / 100));
     if ((count - side) % 2) side++;
-    return { side, start: (count - side) / 2 };
+    const origin = MARGIN + (count - side) / 2;
+    return { origin, side, inner: origin + 1, box: side - 2 };
   };
 
-  const drawLogo = (ctx, count, cell, bg) => {
-    const { side, start } = logoRect(count);
-    const origin = (MARGIN + start) * cell;
-    const span = side * cell;
-    const { w, h } = fit(logo.img, span - 2 * cell);
+  const roundedPath = (x, y, size, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + size, y, x + size, y + size, r);
+    ctx.arcTo(x + size, y + size, x, y + size, r);
+    ctx.arcTo(x, y + size, x, y, r);
+    ctx.arcTo(x, y, x + size, y, r);
+    ctx.closePath();
+  };
+
+  const drawLogo = (count, bg) => {
+    const { origin, side, inner, box } = logoGeo(count);
+    const { img } = state.logo;
+    const ratio = [box / img.naturalWidth, box / img.naturalHeight];
+    const scale = state.shape === 'square' ? Math.min(...ratio) : Math.max(...ratio);
+    const w = img.naturalWidth * scale;
+    const h = img.naturalHeight * scale;
     ctx.fillStyle = bg;
-    ctx.fillRect(origin, origin, span, span);
-    ctx.drawImage(logo.img, origin + (span - w) / 2, origin + (span - h) / 2, w, h);
+    ctx.fillRect(origin, origin, side, side);
+    ctx.save();
+    roundedPath(inner, inner, box, radius(box));
+    ctx.clip();
+    ctx.drawImage(img, inner + (box - w) / 2, inner + (box - h) / 2, w, h);
+    ctx.restore();
   };
 
-  const drawQr = (qr, size, fg, bg) => {
-    const count = qr.getModuleCount();
-    const total = count + MARGIN * 2;
-    const cell = Math.max(1, Math.floor(size / total));
-    const px = cell * total;
-    const ctx = el.canvas.getContext('2d');
-    el.canvas.width = px;
-    el.canvas.height = px;
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, px, px);
-    ctx.fillStyle = fg;
-    for (let r = 0; r < count; r++) {
-      for (let c = 0; c < count; c++) {
-        if (qr.isDark(r, c)) ctx.fillRect((c + MARGIN) * cell, (r + MARGIN) * cell, cell, cell);
+  const render = () => {
+    const { value, error } = readContent();
+    if (error || !value) return reset(error);
+    try {
+      const qr = buildQr(value);
+      const count = qr.getModuleCount();
+      const total = count + MARGIN * 2;
+      const cell = Math.max(1, Math.floor(Number($('opt-size').value) / total));
+      const fg = $('opt-fg').value;
+      const bg = $('opt-bg').value;
+      canvas.width = canvas.height = cell * total;
+      ctx.setTransform(cell, 0, 0, cell, 0, 0);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, total, total);
+      ctx.fillStyle = fg;
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) ctx.fillRect(c + MARGIN, r + MARGIN, 1, 1);
+        }
       }
+      if (state.logo) drawLogo(count, bg);
+      state.qr = qr;
+      $('empty').hidden = true;
+      canvas.hidden = false;
+      buttons.forEach(b => { b.disabled = false; });
+      showError('');
+    } catch {
+      reset('Nội dung quá dài.');
     }
-    if (logo) drawLogo(ctx, count, cell, bg);
-  };
-
-  const buildSvg = (qr, fg, bg) => {
-    const count = qr.getModuleCount();
-    const total = count + MARGIN * 2;
-    let path = '';
-    for (let r = 0; r < count; r++) {
-      for (let c = 0; c < count; c++) {
-        if (qr.isDark(r, c)) path += `M${c + MARGIN} ${r + MARGIN}h1v1h-1z`;
-      }
-    }
-    let logoSvg = '';
-    if (logo) {
-      const { side, start } = logoRect(count);
-      const origin = MARGIN + start;
-      const { w, h } = fit(logo.img, side - 2);
-      logoSvg =
-        `<rect x="${origin}" y="${origin}" width="${side}" height="${side}" fill="${bg}"/>` +
-        `<image x="${origin + (side - w) / 2}" y="${origin + (side - h) / 2}" width="${w}" height="${h}" href="${logo.url}"/>`;
-    }
-    return `<?xml version="1.0" encoding="UTF-8"?>` +
-      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" width="1024" height="1024" shape-rendering="crispEdges">` +
-      `<rect width="${total}" height="${total}" fill="${bg}"/>` +
-      `<path d="${path}" fill="${fg}"/>${logoSvg}</svg>`;
   };
 
   const reset = message => {
-    current = null;
-    el.canvas.hidden = true;
-    el.empty.hidden = false;
-    el.btnPng.disabled = true;
-    el.btnSvg.disabled = true;
-    el.error.textContent = message || '';
+    state.qr = null;
+    canvas.hidden = true;
+    $('empty').hidden = false;
+    buttons.forEach(b => { b.disabled = true; });
+    showError(message);
   };
 
-  const generate = () => {
-    const { value, error } = getContent();
-    if (error || !value) return reset(error);
-    try {
-      const qr = buildQr(value, logo ? 'H' : el.ecc.value);
-      drawQr(qr, Number(el.size.value), el.fg.value, el.bg.value);
-      current = qr;
-      el.empty.hidden = true;
-      el.canvas.hidden = false;
-      el.btnPng.disabled = false;
-      el.btnSvg.disabled = false;
-      el.error.textContent = '';
-    } catch {
-      reset(MSG.tooLong);
+  const schedule = () => {
+    clearTimeout(timer);
+    timer = setTimeout(render, 120);
+  };
+
+  const buildSvg = () => {
+    const count = state.qr.getModuleCount();
+    const total = count + MARGIN * 2;
+    const fg = $('opt-fg').value;
+    const bg = $('opt-bg').value;
+    let path = '';
+    for (let r = 0; r < count; r++) {
+      for (let c = 0; c < count; c++) {
+        if (state.qr.isDark(r, c)) path += `M${c + MARGIN} ${r + MARGIN}h1v1h-1z`;
+      }
     }
+    let logo = '';
+    if (state.logo) {
+      const { origin, side, inner, box } = logoGeo(count);
+      const fit = state.shape === 'square' ? 'meet' : 'slice';
+      logo = `<rect x="${origin}" y="${origin}" width="${side}" height="${side}" fill="${bg}"/>` +
+        `<clipPath id="c"><rect x="${inner}" y="${inner}" width="${box}" height="${box}" rx="${radius(box)}"/></clipPath>` +
+        `<image x="${inner}" y="${inner}" width="${box}" height="${box}" preserveAspectRatio="xMidYMid ${fit}" clip-path="url(#c)" href="${state.logo.url}"/>`;
+    }
+    return `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" width="1024" height="1024" shape-rendering="crispEdges">` +
+      `<rect width="${total}" height="${total}" fill="${bg}"/><path d="${path}" fill="${fg}"/>${logo}</svg>`;
   };
 
-  const fileName = ext => {
-    const stamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
-    return `qr-${stamp}.${ext}`;
-  };
+  const pngBlob = () => new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+  const fileName = ext => `qr-${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.${ext}`;
 
   const save = (blob, name) => {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
+    const a = Object.assign(document.createElement('a'), { href: url, download: name });
     document.body.append(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   };
 
-  const setMode = next => {
-    mode = next;
-    const isText = next === 'text';
-    el.tabText.setAttribute('aria-selected', isText);
-    el.tabWeb.setAttribute('aria-selected', !isText);
-    el.viewText.hidden = !isText;
-    el.viewWeb.hidden = isText;
-    generate();
+  const flash = text => {
+    const btn = $('btn-copy');
+    btn.textContent = text;
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => { btn.textContent = 'Sao chép'; }, 1600);
   };
 
+  const copyImage = async () => {
+    if (!state.qr) return;
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob() })]);
+      flash('Đã chép');
+      return;
+    } catch {}
+    try {
+      const blob = await pngBlob();
+      const file = new File([blob], fileName('png'), { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+      save(blob, file.name);
+      flash('Đã tải PNG');
+    } catch (err) {
+      if (err && err.name !== 'AbortError') flash('Không chép được');
+    }
+  };
+
+  const pick = (box, onPick) => box.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    box.querySelectorAll('button').forEach(node => node.setAttribute('aria-pressed', node === btn));
+    onPick(btn.dataset.v);
+  });
+
+  pick($('seg-mode'), value => {
+    state.mode = value;
+    $('in-text').hidden = value !== 'text';
+    $('in-web').hidden = value !== 'web';
+    render();
+  });
+  pick($('seg-shape'), value => { state.shape = value; render(); });
+
   const setLogo = (url, img) => {
-    logo = { url, img };
-    el.logoThumb.src = url;
-    el.logoInfo.hidden = false;
-    el.btnLogoClear.disabled = false;
-    if (savedEcc === null) savedEcc = el.ecc.value;
-    el.ecc.value = 'H';
-    el.ecc.disabled = true;
-    generate();
+    state.logo = { url, img };
+    $('logo-thumb').src = url;
+    $('logo-tools').hidden = false;
+    $('btn-logo-clear').disabled = false;
+    render();
   };
 
   const clearLogo = () => {
-    logo = null;
-    el.logoFile.value = '';
-    el.logoThumb.removeAttribute('src');
-    el.logoInfo.hidden = true;
-    el.btnLogoClear.disabled = true;
-    if (savedEcc !== null) el.ecc.value = savedEcc;
-    savedEcc = null;
-    el.ecc.disabled = false;
-    generate();
+    state.logo = null;
+    $('logo-file').value = '';
+    $('logo-thumb').removeAttribute('src');
+    $('logo-tools').hidden = true;
+    $('btn-logo-clear').disabled = true;
+    render();
   };
 
   const loadLogo = file => {
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      el.error.textContent = MSG.notImage;
-      el.logoFile.value = '';
-      return;
-    }
+    if (!file.type.startsWith('image/')) return showError('File này không phải ảnh.');
     const reader = new FileReader();
-    reader.onerror = () => { el.error.textContent = MSG.readFail; };
+    reader.onerror = () => showError('Không đọc được ảnh.');
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => { el.error.textContent = MSG.readFail; };
+      img.onerror = () => showError('Không đọc được ảnh.');
       img.onload = () => setLogo(reader.result, img);
       img.src = reader.result;
     };
     reader.readAsDataURL(file);
   };
 
-  el.tabText.addEventListener('click', () => setMode('text'));
-  el.tabWeb.addEventListener('click', () => setMode('web'));
-  el.btnLogo.addEventListener('click', () => el.logoFile.click());
-  el.btnLogoClear.addEventListener('click', clearLogo);
-  el.logoFile.addEventListener('change', () => loadLogo(el.logoFile.files[0]));
-  el.logoSize.addEventListener('input', () => {
-    el.logoPct.textContent = el.logoSize.value + '%';
-    generate();
+  $('btn-logo').addEventListener('click', () => $('logo-file').click());
+  $('btn-logo-clear').addEventListener('click', clearLogo);
+  $('logo-file').addEventListener('change', e => loadLogo(e.target.files[0]));
+  $('logo-size').addEventListener('input', e => {
+    $('logo-pct').textContent = e.target.value + '%';
+    schedule();
   });
-  el.btnPng.addEventListener('click', () => {
-    if (current) el.canvas.toBlob(blob => blob && save(blob, fileName('png')), 'image/png');
+  $('btn-png').addEventListener('click', async () => {
+    const blob = state.qr && await pngBlob();
+    if (blob) save(blob, fileName('png'));
   });
-  el.btnSvg.addEventListener('click', () => {
-    if (current) save(new Blob([buildSvg(current, el.fg.value, el.bg.value)], { type: 'image/svg+xml;charset=utf-8' }), fileName('svg'));
+  $('btn-svg').addEventListener('click', () => {
+    if (state.qr) save(new Blob([buildSvg()], { type: 'image/svg+xml;charset=utf-8' }), fileName('svg'));
   });
+  $('btn-copy').addEventListener('click', copyImage);
 
-  [el.inputText, el.inputWeb, el.fg, el.bg].forEach(node => node.addEventListener('input', generate));
-  [el.size, el.ecc].forEach(node => node.addEventListener('change', generate));
+  ['in-text', 'in-web', 'opt-fg', 'opt-bg'].forEach(id => $(id).addEventListener('input', schedule));
+  $('opt-size').addEventListener('change', render);
 })();
 </script>
 </body>
