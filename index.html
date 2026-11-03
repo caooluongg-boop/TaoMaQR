@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tạo mã QR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e8eef2;
+  --panel:#ffffff;
+  --ink:#14232b;
+  --muted:#5b6b75;
+  --line:#c8d3da;
+  --accent:#0e6b66;
+  --accent-ink:#ffffff;
+  --danger:#b3261e;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  line-height:1.5;
+  padding:20px 16px 40px;
+}
+.app{max-width:520px;margin:0 auto}
+h1{font-size:26px;font-weight:700;margin:4px 0 4px;letter-spacing:-0.3px}
+.sub{color:var(--muted);margin:0 0 20px;font-size:15px}
+.tabs{
+  display:grid;grid-template-columns:1fr 1fr;
+  background:#d5dee4;border-radius:12px;padding:4px;margin-bottom:16px;
+}
+.tab{
+  appearance:none;border:0;background:transparent;color:var(--muted);
+  font:inherit;font-weight:600;font-size:15px;padding:11px 8px;border-radius:9px;cursor:pointer;
+}
+.tab[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(20,35,43,.18)}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #6bb7b1;outline-offset:2px}
+.panel{background:var(--panel);border-radius:16px;padding:18px;margin-bottom:16px}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+textarea,input[type="text"],input[type="url"],select{
+  width:100%;font:inherit;font-size:16px;color:var(--ink);background:#f6f9fb;
+  border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;
+}
+textarea{min-height:120px;resize:vertical}
+.hint{color:var(--muted);font-size:13px;margin:6px 0 0}
+.view[hidden]{display:none}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.opts .full{grid-column:1 / -1}
+.colors{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type="color"]{
+  width:100%;height:44px;border:1.5px solid var(--line);border-radius:10px;background:#f6f9fb;padding:3px;cursor:pointer;
+}
+.btn{
+  appearance:none;border:0;font:inherit;font-weight:600;font-size:16px;
+  padding:13px 18px;border-radius:12px;cursor:pointer;width:100%;
+}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:#e3ebef;color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.result{text-align:center}
+.stage{
+  background:#f6f9fb;border:1.5px dashed var(--line);border-radius:14px;
+  min-height:260px;display:flex;align-items:center;justify-content:center;padding:14px;
+}
+.stage canvas{max-width:100%;height:auto;display:block;border-radius:6px}
+.empty{color:var(--muted);font-size:14px;max-width:240px}
+.error{color:var(--danger);font-weight:500;font-size:14px;margin:10px 0 0;min-height:20px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.meta{color:var(--muted);font-size:13px;margin-top:10px;word-break:break-all}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <h1>Tạo mã QR</h1>
+  <p class="sub">Biến văn bản hoặc đường dẫn website thành mã QR để quét và tải về máy.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-text" aria-selected="true" aria-controls="view-text">Văn bản</button>
+    <button class="tab" role="tab" id="tab-web" aria-selected="false" aria-controls="view-web">Website</button>
+  </div>
+
+  <section class="panel">
+    <div class="view" id="view-text" role="tabpanel" aria-labelledby="tab-text">
+      <label for="input-text">Nội dung văn bản</label>
+      <textarea id="input-text" placeholder="Nhập hoặc dán văn bản vào đây"></textarea>
+      <p class="hint">Hỗ trợ tiếng Việt có dấu. Văn bản càng dài thì mã QR càng dày và khó quét.</p>
+    </div>
+
+    <div class="view" id="view-web" role="tabpanel" aria-labelledby="tab-web" hidden>
+      <label for="input-web">Địa chỉ website</label>
+      <input type="url" id="input-web" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="vi-du.com hoặc https://vi-du.com/trang">
+      <p class="hint">Nếu thiếu https:// thì sẽ tự động thêm vào.</p>
+    </div>
+
+    <div class="opts">
+      <div>
+        <label for="opt-size">Kích thước ảnh</label>
+        <select id="opt-size">
+          <option value="256">256 px</option>
+          <option value="512" selected>512 px</option>
+          <option value="1024">1024 px</option>
+          <option value="2048">2048 px</option>
+        </select>
+      </div>
+      <div>
+        <label for="opt-ecc">Độ chịu lỗi</label>
+        <select id="opt-ecc">
+          <option value="L">Thấp (L)</option>
+          <option value="M" selected>Vừa (M)</option>
+          <option value="Q">Khá (Q)</option>
+          <option value="H">Cao (H)</option>
+        </select>
+      </div>
+      <div class="full colors">
+        <div>
+          <label for="opt-fg">Màu mã</label>
+          <input type="color" id="opt-fg" value="#14232b">
+        </div>
+        <div>
+          <label for="opt-bg">Màu nền</label>
+          <input type="color" id="opt-bg" value="#ffffff">
+        </div>
+      </div>
+      <div class="full">
+        <button class="btn primary" id="btn-make" type="button">Tạo mã QR</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel result">
+    <div class="stage" id="stage">
+      <div class="empty" id="empty">Mã QR sẽ hiện ở đây sau khi bạn nhập nội dung.</div>
+      <canvas id="canvas" hidden></canvas>
+    </div>
+    <p class="error" id="error" role="alert"></p>
+    <div class="actions">
+      <button class="btn primary" id="btn-png" type="button" disabled>Tải ảnh PNG</button>
+      <button class="btn ghost" id="btn-svg" type="button" disabled>Tải file SVG</button>
+    </div>
+    <div class="meta" id="meta"></div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function(){
+  if(window.qrcode && qrcode.stringToBytesFuncs && qrcode.stringToBytesFuncs['UTF-8']){
+    qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+  }
+
+  var tabText = document.getElementById('tab-text');
+  var tabWeb = document.getElementById('tab-web');
+  var viewText = document.getElementById('view-text');
+  var viewWeb = document.getElementById('view-web');
+  var inputText = document.getElementById('input-text');
+  var inputWeb = document.getElementById('input-web');
+  var optSize = document.getElementById('opt-size');
+  var optEcc = document.getElementById('opt-ecc');
+  var optFg = document.getElementById('opt-fg');
+  var optBg = document.getElementById('opt-bg');
+  var btnMake = document.getElementById('btn-make');
+  var btnPng = document.getElementById('btn-png');
+  var btnSvg = document.getElementById('btn-svg');
+  var canvas = document.getElementById('canvas');
+  var empty = document.getElementById('empty');
+  var errorBox = document.getElementById('error');
+  var meta = document.getElementById('meta');
+
+  var mode = 'text';
+  var current = null;
+
+  function setMode(next){
+    mode = next;
+    var isText = next === 'text';
+    tabText.setAttribute('aria-selected', String(isText));
+    tabWeb.setAttribute('aria-selected', String(!isText));
+    viewText.hidden = !isText;
+    viewWeb.hidden = isText;
+    generate();
+  }
+
+  function normalizeUrl(raw){
+    var value = raw.trim();
+    if(!value) return {value:'', error:''};
+    if(!/^[a-z][a-z0-9+.\-]*:\/\//i.test(value)){
+      value = 'https://' + value;
+    }
+    try{
+      var u = new URL(value);
+      var host = u.hostname;
+      if(host !== 'localhost' && host.indexOf('.') === -1){
+        return {value:'', error:'Địa chỉ website chưa hợp lệ. Ví dụ: vi-du.com'};
+      }
+      return {value:u.href, error:''};
+    }catch(e){
+      return {value:'', error:'Địa chỉ website chưa hợp lệ. Ví dụ: vi-du.com'};
+    }
+  }
+
+  function getContent(){
+    if(mode === 'text'){
+      return {value:inputText.value, error:''};
+    }
+    return normalizeUrl(inputWeb.value);
+  }
+
+  function clearResult(message){
+    current = null;
+    canvas.hidden = true;
+    empty.hidden = false;
+    btnPng.disabled = true;
+    btnSvg.disabled = true;
+    meta.textContent = '';
+    errorBox.textContent = message || '';
+  }
+
+  function build(text, ecc){
+    var qr = qrcode(0, ecc);
+    qr.addData(text, 'Byte');
+    qr.make();
+    return qr;
+  }
+
+  function layout(qr, size){
+    var count = qr.getModuleCount();
+    var margin = 4;
+    var total = count + margin * 2;
+    var cell = Math.max(1, Math.floor(size / total));
+    return {count:count, margin:margin, total:total, cell:cell, px:cell * total};
+  }
+
+  function draw(qr, size, fg, bg){
+    var l = layout(qr, size);
+    canvas.width = l.px;
+    canvas.height = l.px;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, l.px, l.px);
+    ctx.fillStyle = fg;
+    for(var r = 0; r < l.count; r++){
+      for(var c = 0; c < l.count; c++){
+        if(qr.isDark(r, c)){
+          ctx.fillRect((c + l.margin) * l.cell, (r + l.margin) * l.cell, l.cell, l.cell);
+        }
+      }
+    }
+    return l;
+  }
+
+  function buildSvg(qr, fg, bg){
+    var count = qr.getModuleCount();
+    var margin = 4;
+    var total = count + margin * 2;
+    var path = '';
+    for(var r = 0; r < count; r++){
+      for(var c = 0; c < count; c++){
+        if(qr.isDark(r, c)){
+          path += 'M' + (c + margin) + ' ' + (r + margin) + 'h1v1h-1z';
+        }
+      }
+    }
+    return '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + total + ' ' + total + '" width="1024" height="1024" shape-rendering="crispEdges">' +
+      '<rect width="' + total + '" height="' + total + '" fill="' + bg + '"/>' +
+      '<path d="' + path + '" fill="' + fg + '"/></svg>';
+  }
+
+  function generate(){
+    var content = getContent();
+    if(content.error){
+      clearResult(content.error);
+      return;
+    }
+    if(!content.value){
+      clearResult('');
+      return;
+    }
+    try{
+      var size = parseInt(optSize.value, 10);
+      var qr = build(content.value, optEcc.value);
+      var l = draw(qr, size, optFg.value, optBg.value);
+      current = {qr:qr, text:content.value};
+      empty.hidden = true;
+      canvas.hidden = false;
+      btnPng.disabled = false;
+      btnSvg.disabled = false;
+      errorBox.textContent = '';
+      meta.textContent = 'Ảnh ' + l.px + ' x ' + l.px + ' px. Nội dung: ' + (content.value.length > 80 ? content.value.slice(0, 80) + '...' : content.value);
+    }catch(e){
+      clearResult('Nội dung quá dài để tạo mã QR. Hãy rút gọn hoặc giảm độ chịu lỗi xuống mức thấp hơn.');
+    }
+  }
+
+  function fileName(ext){
+    var stamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+    return 'qr-' + (mode === 'web' ? 'website' : 'van-ban') + '-' + stamp + '.' + ext;
+  }
+
+  function saveBlob(blob, name){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+
+  btnPng.addEventListener('click', function(){
+    if(!current) return;
+    if(canvas.toBlob){
+      canvas.toBlob(function(blob){
+        if(blob) saveBlob(blob, fileName('png'));
+      }, 'image/png');
+    }else{
+      var a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = fileName('png');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  });
+
+  btnSvg.addEventListener('click', function(){
+    if(!current) return;
+    var svg = buildSvg(current.qr, optFg.value, optBg.value);
+    saveBlob(new Blob([svg], {type:'image/svg+xml;charset=utf-8'}), fileName('svg'));
+  });
+
+  tabText.addEventListener('click', function(){ setMode('text'); });
+  tabWeb.addEventListener('click', function(){ setMode('web'); });
+  btnMake.addEventListener('click', generate);
+  inputText.addEventListener('input', generate);
+  inputWeb.addEventListener('input', generate);
+  optSize.addEventListener('change', generate);
+  optEcc.addEventListener('change', generate);
+  optFg.addEventListener('input', generate);
+  optBg.addEventListener('input', generate);
+
+  if(!window.qrcode){
+    errorBox.textContent = 'Không tải được thư viện tạo QR. Hãy kiểm tra kết nối mạng rồi mở lại trang.';
+    btnMake.disabled = true;
+  }
+})();
+</script>
+</body>
+</html>
